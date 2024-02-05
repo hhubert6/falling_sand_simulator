@@ -28,6 +28,7 @@ class App(tk.Tk):
 
     def loop(self) -> None:
         while True:
+            self.sand.update()
             self.update_idletasks()
             self.update()
             time.sleep(self.REFRESH_RATE)
