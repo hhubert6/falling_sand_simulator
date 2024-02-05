@@ -5,8 +5,8 @@ from Sand import Sand
 
 
 class App(tk.Tk):
-    WINDOW_HEIGHT = 500
-    WINDOW_WIDTH = 700
+    WINDOW_HEIGHT = 700
+    WINDOW_WIDTH = 1000
     REFRESH_RATE = 0.01
 
     def __init__(self, *args, **kwargs) -> None:
