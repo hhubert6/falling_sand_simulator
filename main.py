@@ -28,10 +28,16 @@ class App(tk.Tk):
 
     def loop(self) -> None:
         while True:
+            s = time.perf_counter()
+
             self.sand.update()
             self.update_idletasks()
             self.update()
-            time.sleep(self.REFRESH_RATE)
+
+            e = time.perf_counter()
+
+            elapsed_time = e - s
+            time.sleep(max(0, self.REFRESH_RATE - elapsed_time))
 
 
 if __name__ == "__main__":
