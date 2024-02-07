@@ -1,3 +1,5 @@
+import time
+
 import pygame as pg
 
 from Sand import Sand
@@ -26,6 +28,8 @@ def main() -> None:
     screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pg.time.Clock()
     running = True
+    dt = 0
+    acc = 0
 
     sand = Sand(SCREEN_WIDTH, SCREEN_HEIGHT)
 
@@ -37,12 +41,19 @@ def main() -> None:
 
         screen.fill("white")
 
-        sand.update()
+        while acc >= 1 / 60:
+            s = time.perf_counter()
+            sand.update()
+            e = time.perf_counter()
+            print(e - s)
+            acc -= 1 / 60
+
         handle_add_sand(sand)
         draw_sand(screen, sand)
 
         pg.display.flip()
-        clock.tick(60)
+        dt = clock.tick(60) / 1000
+        acc += dt
 
     pg.quit()
 
