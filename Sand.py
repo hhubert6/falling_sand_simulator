@@ -56,15 +56,12 @@ class Sand:
             math.floor(y / self._grain_size),
         )
 
-    @property
-    def grains(self) -> list[tuple[int, int, str]]:
-        return [
-            (*pos, color)
-            for pos, color in self._grains.items()
-        ]
-
     def _get_real_position(self, grid_x: int, grid_y: int) -> tuple[int, int]:
         return grid_x * self._grain_size, grid_y * self._grain_size
+
+    @property
+    def grains_list(self) -> list[tuple[int, int, str]]:
+        return [(*pos, color) for pos, color in self._grains.items()]
 
     @property
     def grain_size(self) -> int:

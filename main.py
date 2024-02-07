@@ -7,7 +7,7 @@ SCREEN_HEIGHT = 720
 
 
 def draw_sand(screen: pg.Surface, sand: Sand) -> None:
-    for x, y, color in sand.grains:
+    for x, y, color in sand.grains_list:
         rect = pg.Rect(
             (x * sand.grain_size, y * sand.grain_size), (sand.grain_size,) * 2
         )
