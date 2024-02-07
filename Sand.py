@@ -1,11 +1,13 @@
 import math
 import random
+from collections.abc import Iterator
 
 
 class Sand:
     DEFAULT_GRAIN_SIZE = 10
     SAND_COLORS = ["#ffae00", "#ffb619", "#ffbc2b", "#ffc240"]
     _grains: list[list[str | None]]
+    _settled: list[list[int]]
 
     def __init__(
         self,
@@ -16,9 +18,10 @@ class Sand:
         self._grain_size = grain_size
         self.width, self.height = self._get_grid_position(width, height)
         self._grains = [[None] * self.width for _ in range(self.height)]
+        self._settled = [[0] * self.width for _ in range(self.height)]
 
     def add_grains(self, x: int, y: int) -> None:
-        for r in range(0, self._grain_size * 5, self._grain_size):
+        for r in range(0, self._grain_size * 4, self._grain_size):
             for deg in range(0, int(2 * math.pi * 2)):
                 deg = deg / 2
                 dx, dy = r * math.cos(deg), r * math.sin(deg)
@@ -28,24 +31,31 @@ class Sand:
     def add_single_grain(self, x: int, y: int) -> None:
         grid_x, grid_y = self._get_grid_position(x, y)
 
-        if self._can_move_to((grid_x, grid_y)):
+        if self._can_move_to(grid_x, grid_y):
             self._grains[grid_y][grid_x] = random.choice(self.SAND_COLORS)
 
     def update(self) -> None:
         for y in range(self.height - 1, -1, -1):
-            for x in range(self.width - 1, -1, -1):
-                if self._grains[y][x] is None:
-                    continue
-                pos = x, y
-                if self._can_move_to((target_pos := (x, y + 1))):
-                    self._move_grain(pos, target_pos)
-                elif self._can_move_to((target_pos := (x + 1, y + 1))):
-                    self._move_grain(pos, target_pos)
-                elif self._can_move_to((target_pos := (x - 1, y + 1))):
-                    self._move_grain(pos, target_pos)
+            for x in reversed(range(self.width)) if y % 2 == 0 else range(self.width):
+                if self._grains[y][x] and self._settled[y][x] < 100:
+                    self._update_grain(x, y)
 
-    def _can_move_to(self, pos: tuple[int, int]) -> bool:
-        x, y = pos
+    def _update_grain(self, x: int, y: int):
+        target_pos: tuple[int, int] | None = None
+
+        if self._can_move_to(x, y + 1):
+            target_pos = x, y + 1
+        elif self._can_move_to(x + 1, y + 1):
+            target_pos = x + 1, y + 1
+        elif self._can_move_to(x - 1, y + 1):
+            target_pos = x - 1, y + 1
+        else:
+            self._settled[y][x] += 1
+
+        if target_pos:
+            self._move_grain((x, y), target_pos)
+
+    def _can_move_to(self, x: int, y: int) -> bool:
         return (
             0 <= y < self.height and 0 <= x < self.width and self._grains[y][x] is None
         )
@@ -64,13 +74,11 @@ class Sand:
         return grid_x * self._grain_size, grid_y * self._grain_size
 
     @property
-    def grains_list(self) -> list[tuple[int, int, str]]:
-        return [
-            (x, y, color)
-            for x in range(self.width)
-            for y in range(self.height)
-            if (color := self._grains[y][x])
-        ]
+    def grains_list(self) -> Iterator[tuple[int, int, str]]:
+        for x in range(self.width):
+            for y in range(self.height):
+                if color := self._grains[y][x]:
+                    yield (x, y, color)
 
     @property
     def grain_size(self) -> int:

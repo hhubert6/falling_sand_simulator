@@ -6,6 +6,7 @@ from Sand import Sand
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
+FRAMERATE = 60
 
 
 def draw_sand(screen: pg.Surface, sand: Sand) -> None:
@@ -41,18 +42,18 @@ def main() -> None:
 
         screen.fill("white")
 
-        while acc >= 1 / 60:
+        while acc >= 1 / FRAMERATE:
             s = time.perf_counter()
             sand.update()
             e = time.perf_counter()
             print(e - s)
-            acc -= 1 / 60
+            acc -= 1 / FRAMERATE
 
         handle_add_sand(sand)
         draw_sand(screen, sand)
 
         pg.display.flip()
-        dt = clock.tick(60) / 1000
+        dt = clock.tick(FRAMERATE) / 1000
         acc += dt
 
     pg.quit()
