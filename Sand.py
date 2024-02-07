@@ -18,10 +18,10 @@ class Sand:
 
     def add_grains(self, x: int, y: int) -> None:
         for r in range(0, self._grain_size * 3, self._grain_size):
-            for deg in range(0, int(2 * math.pi * 5)):
-                deg = deg / 5
+            for deg in range(0, int(2 * math.pi * 2)):
+                deg = deg / 2
                 dx, dy = r * math.cos(deg), r * math.sin(deg)
-                if random.random() < 0.4:
+                if random.random() < 0.5:
                     self.add_single_grain(int(x + dx), int(y + dy))
 
     def add_single_grain(self, x: int, y: int) -> None:
@@ -33,22 +33,22 @@ class Sand:
     def update(self) -> None:
         coords = sorted(self._grains.keys(), key=lambda p: p[::-1], reverse=True)
 
-        for x, y in coords:
-            if self._can_move_to(x, y + 1):
-                self._move_grain(x, y, 0, 1)
-            elif self._can_move_to(x + 1, y + 1):
-                self._move_grain(x, y, 1, 1)
-            elif self._can_move_to(x - 1, y + 1):
-                self._move_grain(x, y, -1, 1)
+        for pos in coords:
+            x, y = pos
+            if self._can_move_to(*(target_pos := (x, y + 1))):
+                self._move_grain(pos, target_pos)
+            elif self._can_move_to(*(target_pos := (x + 1, y + 1))):
+                self._move_grain(pos, target_pos)
+            elif self._can_move_to(*(target_pos := (x - 1, y + 1))):
+                self._move_grain(pos, target_pos)
 
-    def _can_move_to(self, x, y):
+    def _can_move_to(self, x: int, y: int) -> bool:
         return (
             (x, y) not in self._grains and 0 <= x < self.width and 0 <= y < self.height
         )
 
-    def _move_grain(self, x: int, y: int, dx: int, dy: int) -> None:
-        target_x, target_y = x + dx, y + dy
-        self._grains[target_x, target_y] = self._grains.pop((x, y))
+    def _move_grain(self, pos: tuple[int, int], target_pos: tuple[int, int]) -> None:
+        self._grains[target_pos] = self._grains.pop(pos)
 
     def _get_grid_position(self, x: int, y: int) -> tuple[int, int]:
         return (
@@ -56,14 +56,16 @@ class Sand:
             math.floor(y / self._grain_size),
         )
 
-    def get_grains(self):
+    @property
+    def grains(self) -> list[tuple[int, int, str]]:
         return [
-            (self._get_real_position(*pos), color)
+            (*pos, color)
             for pos, color in self._grains.items()
         ]
 
     def _get_real_position(self, grid_x: int, grid_y: int) -> tuple[int, int]:
         return grid_x * self._grain_size, grid_y * self._grain_size
 
-    def get_grain_size(self) -> int:
+    @property
+    def grain_size(self) -> int:
         return self._grain_size

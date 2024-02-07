@@ -7,9 +7,17 @@ SCREEN_HEIGHT = 720
 
 
 def draw_sand(screen: pg.Surface, sand: Sand) -> None:
-    for pos, color in sand.get_grains():
-        rect = pg.Rect(pos, (sand.get_grain_size(), sand.get_grain_size()))
+    for x, y, color in sand.grains:
+        rect = pg.Rect(
+            (x * sand.grain_size, y * sand.grain_size), (sand.grain_size,) * 2
+        )
         pg.draw.rect(screen, color, rect)
+
+
+def handle_add_sand(sand: Sand) -> None:
+    mouse_pressed, _, _ = pg.mouse.get_pressed()
+    if mouse_pressed:
+        sand.add_grains(*pg.mouse.get_pos())
 
 
 def main() -> None:
@@ -30,11 +38,7 @@ def main() -> None:
         screen.fill("white")
 
         sand.update()
-
-        mouse_pressed, _, _ = pg.mouse.get_pressed()
-        if mouse_pressed:
-            sand.add_grains(*pg.mouse.get_pos())
-
+        handle_add_sand(sand)
         draw_sand(screen, sand)
 
         pg.display.flip()
