@@ -6,11 +6,11 @@ from tkinter import Canvas, Event
 class Sand:
     GRAIN_SIZE = 10
     grains: dict[tuple[int, int], int] = {}
-    unsettled: set[tuple[int, int]] = set()
 
     def __init__(self, canvas: Canvas, width: int, height: int) -> None:
         self.canvas = canvas
         self.width, self.height = self.get_grid_position(width, height)
+
         canvas.bind("<Button-1>", self.add_grains)
         canvas.bind("<B1-Motion>", self.add_grains)
 
@@ -42,10 +42,9 @@ class Sand:
         )
 
         self.grains[grid_x, grid_y] = grain
-        self.unsettled.add((grid_x, grid_y))
 
     def update(self) -> None:
-        coords = sorted(self.unsettled, key=lambda p: p[::-1], reverse=True)
+        coords = sorted(self.grains.keys(), key=lambda p: p[::-1], reverse=True)
 
         for x, y in coords:
             if self.can_move_to(x, y + 1):
@@ -54,8 +53,6 @@ class Sand:
                 self.move_grain(x, y, 1, 1)
             elif self.can_move_to(x - 1, y + 1):
                 self.move_grain(x, y, -1, 1)
-            else:
-                self.unsettled.remove((x, y))
 
     def can_move_to(self, x, y):
         return (
@@ -67,9 +64,6 @@ class Sand:
 
         grain = self.grains.pop((x, y))
         self.grains[target_x, target_y] = grain
-
-        self.unsettled.remove((x, y))
-        self.unsettled.add((target_x, target_y))
 
         self.canvas.move(grain, dx * self.GRAIN_SIZE, dy * self.GRAIN_SIZE)
 
