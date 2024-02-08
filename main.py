@@ -1,5 +1,3 @@
-import time
-
 import pygame as pg
 
 from Sand import Sand
@@ -43,10 +41,7 @@ def main() -> None:
         screen.fill("white")
 
         while acc >= 1 / FRAMERATE:
-            s = time.perf_counter()
             sand.update()
-            e = time.perf_counter()
-            print(e - s)
             acc -= 1 / FRAMERATE
 
         handle_add_sand(sand)

@@ -1,12 +1,19 @@
 import math
 import random
 from collections.abc import Iterator
+from dataclasses import dataclass
+
+
+@dataclass
+class SandGrain:
+    color: str
+    velocity: float = 0
 
 
 class Sand:
     DEFAULT_GRAIN_SIZE = 10
     SAND_COLORS = ["#ffae00", "#ffb619", "#ffbc2b", "#ffc240"]
-    _grains: list[list[str | None]]
+    _grains: list[list[SandGrain | None]]
     _settled: list[list[int]]
 
     def __init__(
@@ -32,7 +39,7 @@ class Sand:
         grid_x, grid_y = self._get_grid_position(x, y)
 
         if self._can_move_to(grid_x, grid_y):
-            self._grains[grid_y][grid_x] = random.choice(self.SAND_COLORS)
+            self._grains[grid_y][grid_x] = SandGrain(random.choice(self.SAND_COLORS), 1)
 
     def update(self) -> None:
         for y in range(self.height - 1, -1, -1):
@@ -42,9 +49,18 @@ class Sand:
 
     def _update_grain(self, x: int, y: int):
         target_pos: tuple[int, int] | None = None
+        grain: SandGrain = self._grains[y][x]  # type: ignore
 
         if self._can_move_to(x, y + 1):
-            target_pos = x, y + 1
+            grain.velocity += 0.2
+            target_y = int(y + grain.velocity)
+            if self._can_move_to(x, target_y):
+                target_pos = x, target_y
+            else:
+                for cur_y in range(target_y, y, -1):
+                    if self._can_move_to(x, cur_y):
+                        target_pos = x, cur_y
+                        break
         elif self._can_move_to(x + 1, y + 1):
             target_pos = x + 1, y + 1
         elif self._can_move_to(x - 1, y + 1):
@@ -77,8 +93,8 @@ class Sand:
     def grains_list(self) -> Iterator[tuple[int, int, str]]:
         for x in range(self.width):
             for y in range(self.height):
-                if color := self._grains[y][x]:
-                    yield (x, y, color)
+                if grain := self._grains[y][x]:
+                    yield (x, y, grain.color)
 
     @property
     def grain_size(self) -> int:
