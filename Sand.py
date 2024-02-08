@@ -12,6 +12,7 @@ class SandGrain:
 
 class Sand:
     DEFAULT_GRAIN_SIZE = 10
+    GRAIN_ACCELERATION = 0.1
     SAND_COLORS = ["#ffae00", "#ffb619", "#ffbc2b", "#ffc240"]
     _grains: list[list[SandGrain | None]]
     _settled: list[list[int]]
@@ -47,12 +48,12 @@ class Sand:
                 if self._grains[y][x] and self._settled[y][x] < 100:
                     self._update_grain(x, y)
 
-    def _update_grain(self, x: int, y: int):
+    def _update_grain(self, x: int, y: int) -> None:
         target_pos: tuple[int, int] | None = None
         grain: SandGrain = self._grains[y][x]  # type: ignore
 
         if self._can_move_to(x, y + 1):
-            grain.velocity += 0.2
+            grain.velocity += self.GRAIN_ACCELERATION
             target_y = int(y + grain.velocity)
             if self._can_move_to(x, target_y):
                 target_pos = x, target_y
@@ -88,6 +89,12 @@ class Sand:
 
     def _get_real_position(self, grid_x: int, grid_y: int) -> tuple[int, int]:
         return grid_x * self._grain_size, grid_y * self._grain_size
+
+    def reset(self) -> None:
+        for x in range(self.width):
+            for y in range(self.height):
+                self._grains[y][x] = None
+                self._settled[y][x] = 0
 
     @property
     def grains_list(self) -> Iterator[tuple[int, int, str]]:

@@ -21,6 +21,12 @@ def handle_add_sand(sand: Sand) -> None:
         sand.add_grains(*pg.mouse.get_pos())
 
 
+def handle_reset(sand: Sand) -> None:
+    keys = pg.key.get_pressed()
+    if keys[pg.K_r]:
+        sand.reset()
+
+
 def main() -> None:
     # pg setup
     pg.init()
@@ -45,6 +51,7 @@ def main() -> None:
             acc -= 1 / FRAMERATE
 
         handle_add_sand(sand)
+        handle_reset(sand)
         draw_sand(screen, sand)
 
         pg.display.flip()
