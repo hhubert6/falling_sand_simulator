@@ -29,12 +29,10 @@ class Sand:
         self._settled = [[0] * self.width for _ in range(self.height)]
 
     def add_grains(self, x: int, y: int, pen_size: int) -> None:
-        for r in range(0, pen_size, self._grain_size):
-            for deg in range(0, int(2 * math.pi * 2)):
-                deg = deg / 2
-                dx, dy = r * math.cos(deg), r * math.sin(deg)
-                if random.random() < 0.5:
-                    self.add_single_grain(int(x + dx), int(y + dy))
+        for dx in range(-pen_size, pen_size, self.grain_size):
+            for dy in range(-pen_size, pen_size, self.grain_size):
+                if dx**2 + dy**2 < pen_size**2 and random.random() < 0.5:
+                    self.add_single_grain(x + dx, y + dy)
 
     def add_single_grain(self, x: int, y: int) -> None:
         grid_x, grid_y = self._get_grid_position(x, y)
