@@ -15,16 +15,15 @@ def draw_sand(screen: pg.Surface, sand: Sand) -> None:
         pg.draw.rect(screen, color, rect)
 
 
-def handle_add_sand(sand: Sand) -> None:
+def draw_pen(screen: pg.Surface, pen_size: int) -> None:
+    x, y = pg.mouse.get_pos()
+    pg.draw.circle(screen, "grey", (x, y), pen_size, width=2)
+
+
+def handle_add_sand(sand: Sand, pen_size: int) -> None:
     mouse_pressed, _, _ = pg.mouse.get_pressed()
     if mouse_pressed:
-        sand.add_grains(*pg.mouse.get_pos())
-
-
-def handle_reset(sand: Sand) -> None:
-    keys = pg.key.get_pressed()
-    if keys[pg.K_r]:
-        sand.reset()
+        sand.add_grains(*pg.mouse.get_pos(), pen_size)
 
 
 def main() -> None:
@@ -35,6 +34,7 @@ def main() -> None:
     running = True
     dt = 0
     acc = 0
+    pen_size = 40
 
     sand = Sand(SCREEN_WIDTH, SCREEN_HEIGHT)
 
@@ -50,9 +50,17 @@ def main() -> None:
             sand.update()
             acc -= 1 / FRAMERATE
 
-        handle_add_sand(sand)
-        handle_reset(sand)
+        keys = pg.key.get_pressed()
+        if keys[pg.K_r]:
+            sand.reset()
+        if keys[pg.K_EQUALS] and pen_size < 100:
+            pen_size += 1
+        if keys[pg.K_MINUS] and pen_size > 1:
+            pen_size -= 1
+
+        handle_add_sand(sand, pen_size)
         draw_sand(screen, sand)
+        draw_pen(screen, pen_size)
 
         pg.display.flip()
         dt = clock.tick(FRAMERATE) / 1000

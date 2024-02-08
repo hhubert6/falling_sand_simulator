@@ -11,7 +11,7 @@ class SandGrain:
 
 
 class Sand:
-    DEFAULT_GRAIN_SIZE = 10
+    DEFAULT_GRAIN_SIZE = 5
     GRAIN_ACCELERATION = 0.1
     SAND_COLORS = ["#ffae00", "#ffb619", "#ffbc2b", "#ffc240"]
     _grains: list[list[SandGrain | None]]
@@ -28,8 +28,8 @@ class Sand:
         self._grains = [[None] * self.width for _ in range(self.height)]
         self._settled = [[0] * self.width for _ in range(self.height)]
 
-    def add_grains(self, x: int, y: int) -> None:
-        for r in range(0, self._grain_size * 4, self._grain_size):
+    def add_grains(self, x: int, y: int, pen_size: int) -> None:
+        for r in range(0, pen_size, self._grain_size):
             for deg in range(0, int(2 * math.pi * 2)):
                 deg = deg / 2
                 dx, dy = r * math.cos(deg), r * math.sin(deg)
